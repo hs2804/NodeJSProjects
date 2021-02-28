@@ -6,7 +6,11 @@ const userRouter = require('./routes/usersRoutes');
 
 const app = express();
 app.use(express.json());
-app.use(morgan('dev'));
+
+if(process.env.REGION === 'development'){
+  app.use(morgan('dev'));
+}
+
 app.use(express.static(`${__dirname}/public/`));
 
 app.use((req, res, next) => {

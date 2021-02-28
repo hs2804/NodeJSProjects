@@ -7,7 +7,7 @@
 
 # dependencies
 ./*/node_modules
-./*/config.env
+./../config.env
 
 # IDEs and editors
 /.idea
