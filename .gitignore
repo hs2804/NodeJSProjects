@@ -4,11 +4,10 @@
 /dist
 /tmp
 /out-tsc
-
+test.txt
 # dependencies
-./*/node_modules
-./*/config.env
-
+**/node_modules
+**/*.env
 # IDEs and editors
 /.idea
 .project
