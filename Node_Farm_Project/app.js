@@ -1,11 +1,15 @@
 const express = require('express');
 const morgan = require('morgan');
+//const bodyParser = require('body-parser')
 
 const tourRouter = require('./routes/toursRoutes');
 const userRouter = require('./routes/usersRoutes');
 
 const app = express();
 app.use(express.json());
+// app.use(bodyParser.urlencoded({
+//   extended: true
+// }));
 
 if(process.env.REGION === 'development'){
   app.use(morgan('dev'));
