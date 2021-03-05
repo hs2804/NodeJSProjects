@@ -9,6 +9,12 @@ const Tour = require('../models/tourModel')
 //   next();
 // };
 
+exports.addReqParametersForTopFive = (req, res, next ) => {
+req.query.sort = '-ratingsAverage',
+req.query.limit = '5'
+next();
+}
+
 exports.createTour = async (req, res) => {
  try {
    //console.log(req.body);
@@ -29,15 +35,49 @@ exports.createTour = async (req, res) => {
 };
 exports.getAllTours = async (req, res) => {
   try{
-  const tours = await Tour.find();
+  // 1A) Filtering
+  let queryObject = {...req.query};
+  const excludeKeyWords = ['sort','limit','fields','page'];
+  excludeKeyWords.forEach(el => delete queryObject[el]);
+
+  // 1B) Advanced Filtering
+  let queryStr = JSON.stringify(queryObject);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+  let query = Tour.find(JSON.parse(queryStr));
+
+  // 2) Sorting
+  if(req.query.sort) {
+    const sortBy = req.query.sort.split(',').join(' ');
+    query = query.sort(sortBy);
+  }else{
+    query = query.sort('-createdAt') //Descending Order by default
+  }
+
+  // 3) Limiting Fields
+  if(req.query.fields) {
+    const fields = req.query.fields.split(',').join(' ');
+    query = query.select(fields);
+  }else{
+    query = query.select('name summary ratingsAverage') //Descending Order by default
+  }
+
+  // Pagination and Limiting
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 10;
+    const skip = (page - 1) * limit;
+    //console.log(`*************** ${page}*****${limit}`);
+    query = query.skip(skip).limit(limit);
+
+  const tours = await query;
   res.status(200).json({
     status: 'success',
+    result: tours.length,
     tours
   });
 }catch(err) {
   res.status(400).json({
     status: 'error',
-    message: "Error occured while getting all Tours from DB"
+    description: err.message
   })
 }
 };
