@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel')
 const APIFeatures = require('../utils/APIFeatures');
+const catchAsync = require('../utils/catchAsync');
 
 // const tours = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -16,90 +17,50 @@ req.query.limit = '5'
 next();
 }
 
-exports.createTour = async (req, res) => {
- try {
-   //console.log(req.body);
+exports.createTour = catchAsync(async (req, res, next) => {
   const newTour = await Tour.create(req.body);
-
   res.status(201).json({
     status: 'success',
     data: {
       tour: newTour
     }
-  });
-} catch (err){
-  res.status(400).json({
-    status: 'error',
-    message: err
-  })
-} 
-};
-exports.getAllTours = async (req, res) => {
-  try{
+  }); 
+});
+exports.getAllTours = catchAsync(async (req, res,next) => {
   const features = new APIFeatures(Tour.find(), req.query)
       .filter()
       .sort()
       .limitFields()
-      .paginate();
-      
+      .paginate();     
   const tours = await features.query;
   res.status(200).json({
     status: 'success',
     result: tours.length,
     tours
   });
-}catch(err) {
-  res.status(400).json({
-    status: 'error',
-    description: err.message
-  })
-}
-};
-exports.getTour = async (req, res) => {
-  try {
+});
+
+exports.getTour = catchAsync(async (req, res) => {
     const tour = await Tour.findById(req.params.id);
     res.status(200).json({
       status: 'success',
       tour
-    });
-  }catch (err) {
-    res.status(400).json({
-      status: 'error',
-      message: "Error occured while getting the required tour from DB"
-    })
-  }
-  
-};
-exports.updateTour = async (req, res) => {
-  try {
+    });  
+});
+exports.updateTour = catchAsync(async (req, res) => {
     const tour = await Tour.findByIdAndUpdate(req.params.id,req.body,{runValidators: true});
     res.status(200).json({
       status: 'success',
       tour
     });
-  }catch (err) {
-    res.status(400).json({
-      status: 'error',
-      message: "Error occured while updating the required tour in DB"
-    })
-  }
-};
-exports.deleteTour =  async (req, res) => {
-  try {
+});
+exports.deleteTour =  catchAsync(async (req, res) => {
    await Tour.findByIdAndDelete(req.params.id);
     res.status(204).json({
       status: 'success'
-    });
-  }
-  catch(err) {
-     res.status(400).json({
-      status: 'error',
-      message: "Error occured while deleting the required tour in DB"
-    })
-  }; 
-};
-exports.getTourStats = async (req, res) =>{
-  try{
+    }); 
+});
+exports.getTourStats = catchAsync(async (req, res) =>{
     const stats = await Tour.aggregate([
        {
          $match : {ratingsAverage : {$gte : 4.5}}
@@ -126,17 +87,10 @@ exports.getTourStats = async (req, res) =>{
      status: 'success',
      stats
    });
- }catch(err) {
-   res.status(400).json({
-    status: 'error',
-    message: err.message
-  });
-};
-}
+});
 
-exports.getMonthlyPlan = async (req, res ) => {
-  try {
-     const year = req.params.year * 1;
+exports.getMonthlyPlan = catchAsync(async (req, res ) => {
+      const year = req.params.year * 1;
      const plan = await Tour.aggregate([
       {
         $unwind: '$startDates'
@@ -177,11 +131,4 @@ exports.getMonthlyPlan = async (req, res ) => {
       total : plan.length,
       plan
     });
-
-  }catch(err) {
-   res.status(400).json({
-    status: 'error',
-    message: err.message
-  });
-};
-}
+});
