@@ -12,7 +12,7 @@ app.use(express.json());
 //   extended: true
 // }));
 
-if(process.env.REGION === 'development'){
+if(process.env.NODE_ENV === 'development'){
   app.use(morgan('dev'));
 }
 

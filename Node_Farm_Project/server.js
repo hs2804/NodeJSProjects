@@ -10,7 +10,7 @@ mongoose.connect(DB, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
-  useUnifiedTopology:true
+  useUnifiedTopology: true
 }).then(() => {
   console.log('DB Connection Successfull!');
 });
@@ -18,5 +18,6 @@ mongoose.connect(DB, {
 //console.log(process.env);
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
+  //console.log(process.env);
   console.log('Server has been started!');
 });
