@@ -22,6 +22,11 @@ app.use((req, res, next) => {
   console.log('Hello From Custom Middleware 👋');
   next();
 });
+
+app.use((req, res, next) => {
+  req.requestedTime = new Date().toISOString();
+  next();
+});
 // app.get('/api/v1/tours', getAllTours);
 // app.get('/api/v1/tours/:id', getTour);
 // app.post('/api/v1/tours', createTour);
